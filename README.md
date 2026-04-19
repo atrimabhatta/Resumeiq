@@ -1,6 +1,6 @@
 # ResumeIQ — AI Resume Screening System
 
-> Python · FastAPI · NLP · Claude AI · SQLite · No Docker needed
+> Python · FastAPI · NLP · SQLite/PostgreSQL · JWT Auth · No Docker needed
 
 ## Project structure
 
@@ -8,17 +8,18 @@
 resumeiq/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py        ← FastAPI backend (all routes)
-│   ├── database.py    ← SQLite persistence (aiosqlite)
+│   ├── main.py        ← FastAPI backend (all routes + auth)
+│   ├── database.py    ← SQLite / PostgreSQL persistence
 │   └── nlp.py         ← Skill extraction utilities
 ├── frontend/
 │   └── index.html     ← Complete UI (open directly in browser)
 ├── requirements.txt
+├── vercel.json        ← Vercel deployment config
 ├── .env.example
 └── README.md
 ```
 
-## Run in 4 commands
+## Run locally (4 commands)
 
 ```bash
 # 1. Create and activate virtual environment
@@ -29,9 +30,9 @@ venv\Scripts\activate          # Windows
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Set your API key
-set ANTHROPIC_API_KEY=sk-ant-your-key-here    # Windows
-# export ANTHROPIC_API_KEY=sk-ant-...         # Mac/Linux
+# 3. Copy and fill in your environment variables
+copy .env.example .env         # Windows
+# cp .env.example .env         # Mac/Linux
 
 # 4. Start the server
 uvicorn app.main:app --reload --port 8000
@@ -45,15 +46,23 @@ Just open `frontend/index.html` in your browser — no build step, no npm, no No
 - Swagger docs: http://127.0.0.1:8000/docs
 - Frontend: open frontend/index.html directly
 
+## Deploy to Vercel + Neon PostgreSQL
+
+1. Create a free database at [neon.tech](https://neon.tech)
+2. Import this GitHub repo into [vercel.com](https://vercel.com)
+3. Add environment variables in Vercel dashboard:
+   - `DATABASE_URL` — your Neon PostgreSQL connection string
+   - `SECRET_KEY` — a random secret string for JWT signing
+
 ## API endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| POST | `/api/register` | Register a new user |
+| POST | `/api/login` | Login and get JWT token |
 | GET | `/health` | Health check |
 | POST | `/api/screen` | Screen resume (JSON) |
+| POST | `/api/parse-pdf` | Extract text from PDF |
 | POST | `/api/screen/upload` | Screen resume (file upload) |
-| GET | `/api/screenings` | List all past screenings |
+| GET | `/api/screenings` | List your past screenings |
 | GET | `/api/screenings/{id}` | Get one screening |
-
-
-
