@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from .database import init_db, save_screening, get_all_screenings, get_screening_by_id, create_user, get_user_by_username, database
+from app.database import init_db, save_screening, get_all_screenings, get_screening_by_id, create_user, get_user_by_username, database
 
 security = HTTPBearer()
 SECRET_KEY = os.getenv("SECRET_KEY", "supersecretkey_resumeiq_1234!")
@@ -46,14 +46,17 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid auth token")
 
-from app.nlp import parse_resume
+from app.nlp import parse_resume  # noqa
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await database.connect()
+    # Connect only if not already connected (serverless cold-start safety)
+    if not database.is_connected:
+        await database.connect()
     await init_db()
     yield
-    await database.disconnect()
+    if database.is_connected:
+        await database.disconnect()
 
 
 app = FastAPI(
