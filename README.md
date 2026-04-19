@@ -55,6 +55,5 @@ Just open `frontend/index.html` in your browser — no build step, no npm, no No
 | GET | `/api/screenings` | List all past screenings |
 | GET | `/api/screenings/{id}` | Get one screening |
 
-## CV line
 
-> Built end-to-end AI resume screening system — FastAPI REST API, Claude AI NLP scoring, SQLite persistence, interactive frontend; deployed on Railway
+
